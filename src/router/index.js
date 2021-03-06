@@ -10,9 +10,15 @@ export default new Router({
     routes: [
         {
             path: '/',
-            name: 'login-boxed',
+            name: 'login',
             meta: {layout: 'userpages'},
-            component: () => import('../Pages/UserPages/LoginBoxed.vue'),
+            component: () => import('../Pages/UserPages/Login.vue'),
+        },
+        {
+            path: '/forgot-password',
+            name: 'forgot-password',
+            meta: {layout: 'userpages'},
+            component: () => import('../Pages/UserPages/ForgotPassword.vue'),
         },
     ]
 });
