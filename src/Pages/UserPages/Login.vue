@@ -58,13 +58,13 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from "../../Service/axios";
 
 export default {
     data: function () {
         return {
-            email: '',
-            password: '',
+            email: 'ca.ragazzi@gmail.com',
+            password: '654321',
             loading: false,
             reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
         }
@@ -82,18 +82,20 @@ export default {
                 this.loading = false;
                 return;
             }
-            axios.post('http://ragazzitech.caioragazzi.com/usuario/logarSession', {
+            axios.post('/usuario/logarSession', {
                 usr_email: this.email.trim(),
                 usr_senha: this.password,
             }).then((res) => {
-                localStorage.setItem('token', res.data.token)
-                this.makeToast('Autorizado!', 'success', 'Sucesso!');
+                console.log(res);
+                // localStorage.setItem('token', res.data.token)
+                // this.makeToast('Autorizado!', 'success', 'Sucesso!');
             }).catch((err) => {
-                if (err.response.status === 401) {
-                    this.makeToast('Não Autorizado!', 'danger', 'Atenção');
-                } else {
-                    this.makeToast('Erro!', 'danger', 'Atenção');
-                }
+                console.log(err);
+                // if (err.response.status === 401) {
+                //     this.makeToast('Não Autorizado!', 'danger', 'Atenção');
+                // } else {
+                //     this.makeToast('Erro!', 'danger', 'Atenção');
+                // }
                 this.loading = false;
             })
         },
