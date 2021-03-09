@@ -36,7 +36,7 @@
                             <div class="divider"/>
                             <h6 class="mb-0">
                                 Sem conta?
-                                <a href="javascript:void(0);" class="text-primary">Cadastrar</a>
+                                <a href="javascript:void(0);" @click="register()" class="text-primary">Cadastrar</a>
                             </h6>
                         </div>
                         <div class="modal-footer clearfix">
@@ -44,7 +44,7 @@
                                 <a href="javascript:void(0);" @click="recoveryPassword" class="btn-md btn btn-link">Recuperar Senha</a>
                             </div>
                             <div class="float-right">
-                                <b-button :disabled="loading" class="btn-block" variant="primary" @click="login" size="md">
+                                <b-button :disabled="loading" class="btn-block" variant="primary" @click="login()" size="md">
                                     <b-spinner v-if="loading" type="grow" label="Spinning"></b-spinner>
                                     <span v-else>Login</span>
                                 </b-button>
@@ -66,13 +66,14 @@ export default {
             email: 'ca.ragazzi@gmail.com',
             password: '654321',
             loading: false,
+            // eslint-disable-next-line
             reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
         }
     },
     methods:{
         login() {
             this.loading = true;
-            if (!this.email || !this.password) {
+            if (!this.email.trim() || !this.password.trim()) {
                 this.makeToast('Favor preencher todos os campos.', 'danger', 'Atenção');
                 this.loading = false;
                 return;
@@ -86,16 +87,14 @@ export default {
                 usr_email: this.email.trim(),
                 usr_senha: this.password,
             }).then((res) => {
-                console.log(res);
-                // localStorage.setItem('token', res.data.token)
-                // this.makeToast('Autorizado!', 'success', 'Sucesso!');
+                localStorage.setItem('token', res.data.token)
+                this.makeToast('Autorizado!', 'success', 'Sucesso!');
             }).catch((err) => {
-                console.log(err);
-                // if (err.response.status === 401) {
-                //     this.makeToast('Não Autorizado!', 'danger', 'Atenção');
-                // } else {
-                //     this.makeToast('Erro!', 'danger', 'Atenção');
-                // }
+                if (err.response.status === 401) {
+                    this.makeToast('Não Autorizado!', 'danger', 'Atenção');
+                } else {
+                    this.makeToast('Erro!', 'danger', 'Atenção');
+                }
                 this.loading = false;
             })
         },
@@ -109,6 +108,9 @@ export default {
                 autoHideDelay: 5000,
                 variant: variant,
             })
+        },
+        register(){
+            this.$router.push('register');
         }
     }
 }

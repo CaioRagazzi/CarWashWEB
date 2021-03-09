@@ -1,27 +1,26 @@
 <template>
     <div>
-        <div class="h-100 bg-premium-dark">
-            <div class="d-flex h-100 justify-content-center align-items-center">
+        <div class="vh-100 bg-plum-plate bg-animation">
+            <div class="d-flex vh-100 justify-content-center align-items-center">
                 <b-col md="8" class="mx-auto app-login-box">
-                    <div class="app-logo-inverse mx-auto mb-3"/>
-
                     <div class="modal-dialog w-100">
                         <div class="modal-content">
                             <div class="modal-body">
                                 <h5 class="modal-title">
                                     <h4 class="mt-2">
-                                        <div>Welcome,</div>
-                                        <span>It only takes a <span class="text-success">few seconds</span> to create your account</span>
+                                        <div>Bem Vindo,</div>
+                                        <span>Demora apenas <span class="text-success">alguns segundos</span> para criar sua conta</span>
                                     </h4>
                                 </h5>
                                 <div class="divider"/>
                                 <b-form-group id="exampleInputGroup1"
                                               label-for="exampleInput1"
-                                              description="We'll never share your email with anyone else.">
+                                              description="Nós nunca vamos compartilhar seu email com ninguem.">
                                     <b-form-input id="exampleInput1"
                                                   type="email"
                                                   required
-                                                  placeholder="Enter email...">
+                                                  placeholder="Digite seu email..."
+                                                  v-model="email">
                                     </b-form-input>
                                 </b-form-group>
                                 <b-form-group id="exampleInputGroup12"
@@ -29,7 +28,8 @@
                                     <b-form-input id="exampleInput12"
                                                   type="text"
                                                   required
-                                                  placeholder="Enter username...">
+                                                  placeholder="Digite o nome do lava rápido..."
+                                                  v-model="lavaRapidoName">
                                     </b-form-input>
                                 </b-form-group>
                                 <div class="row">
@@ -39,7 +39,8 @@
                                             <b-form-input id="exampleInput2"
                                                           type="password"
                                                           required
-                                                          placeholder="Enter password...">
+                                                          placeholder="Digite a senha..."
+                                                          v-model="password">
                                             </b-form-input>
                                         </b-form-group>
                                     </div>
@@ -49,35 +50,104 @@
                                             <b-form-input id="exampleInput2"
                                                           type="password"
                                                           required
-                                                          placeholder="Repeat password...">
+                                                          placeholder="Repita a senha..."
+                                                          v-model="confirmPassword">
                                             </b-form-input>
                                         </b-form-group>
                                     </div>
                                 </div>
-                                <b-form-checkbox name="check" id="exampleCheck">
-                                    Accept our <a href="javascript:void(0);">Terms and Conditions</a>.
-                                </b-form-checkbox>
                                 <div class="divider"/>
                                 <h6 class="mb-0">
-                                    Already have an account?
-                                    <a href="javascript:void(0);" class="text-primary">Sign in</a>
+                                    Já possui uma conta?
+                                    <a href="javascript:void(0);" @click="goToLogin()" class="text-primary">Logar</a>
                                     |
-                                    <a href="javascript:void(0);" class="text-primary">Recover
-                                        Password</a>
+                                    <a href="javascript:void(0);" @click="goToRecovery()" class="text-primary">Recuperar
+                                        Senha</a>
                                 </h6>
                             </div>
                             <div class="modal-footer d-block text-center">
-                                <b-button color="primary" class="btn-wide btn-pill btn-shadow btn-hover-shine"
-                                          size="lg">Create Account
+                                <b-button variant="primary" @click="createAccount" class="btn-wide btn-pill btn-shadow btn-hover-shine"
+                                          size="md">
+                                          <b-spinner v-if="loading" type="grow" label="Spinning"></b-spinner>
+                                          <span v-else>Criar conta</span>
                                 </b-button>
                             </div>
                         </div>
-                    </div>
-                    <div class="text-center text-white opacity-8 mt-3">
-                        Copyright &copy; ArchitectUI 2019
                     </div>
                 </b-col>
             </div>
         </div>
     </div>
 </template>
+
+<script>
+import axios from "../../Service/axios";
+
+export default {
+    data(){
+        return {
+            loading: false,
+            email: 'ca.ragazzi@gmail.com',
+            lavaRapidoName: 'iWash',
+            password: '123456',
+            confirmPassword: '123456',
+            // eslint-disable-next-line
+            reg: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,24}))$/
+        }
+    },
+    methods: {
+        createAccount(){
+            this.loading = true;
+            if (!this.email.trim() || !this.password.trim() || !this.lavaRapidoName.trim() || !this.confirmPassword.trim()) {
+                this.makeToast('Favor preencher todos os campos.', 'danger', 'Atenção');
+                this.loading = false;
+                return;
+            }
+            if (!this.reg.test(this.email)) {
+                this.makeToast('E-mail inválido!', 'danger', 'Atenção');
+                this.loading = false;
+                return;
+            }
+
+            axios.post('usuario/create', {
+                usr_email: this.email.trim(),
+                usr_lavaRapido: 0,
+                usr_nome: null,
+                usr_senha: this.password,
+                usr_telefone: null,
+                usr_tipo: 1,
+                lav_nome: this.lavaRapidoName.trim(),
+            }).then(async (resUser) => {
+                if (resUser.data.err) {
+                    if (resUser.data.err.code === 'ER_DUP_ENTRY') {
+                        this.makeToast('E-mail já existe!', 'danger', 'Atenção');
+                    } else {
+                        this.makeToast('Erro!', 'danger', 'Atenção');
+                    }
+                    this.loading = false;
+                } else {
+                    this.makeToast('Conta criada com sucesso!', 'success', 'Sucesso');
+                    this.$router.push('/');
+                }
+            }).catch(() => {
+                this.makeToast('Erro!', 'danger', 'Atenção');
+                this.loading = false;
+            });
+        },
+        makeToast(message, variant, title) {
+            this.toastCount++
+            this.$bvToast.toast(message, {
+                title: title,
+                autoHideDelay: 5000,
+                variant: variant,
+            })
+        },
+        goToLogin(){
+            this.$router.push('/');
+        },
+        goToRecovery(){
+            this.$router.push('forgot-password');
+        }
+    }
+}
+</script>

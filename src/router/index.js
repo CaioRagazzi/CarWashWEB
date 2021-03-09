@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import ForgotPassword from "../Pages/UserPages/ForgotPassword.vue";
 import Login from "../Pages/UserPages/Login.vue";
+import Register from "../Pages/UserPages/Register.vue";
 
 Vue.use(Router);
 
@@ -21,6 +22,12 @@ export default new Router({
             name: 'forgot-password',
             meta: {layout: 'userpages'},
             component: ForgotPassword,
+        },
+        {
+            path: '/register',
+            name: 'register',
+            meta: {layout: 'userpages'},
+            component: Register,
         },
     ]
 });
